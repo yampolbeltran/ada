@@ -1,153 +1,124 @@
-import pandas as pd
-import math
-import time
-from tkinter import Tk, Label, Button, Entry, StringVar, ttk, Text, END
+\documentclass[a4paper,12pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
 
-# Funciones de búsqueda
-def buscar_por_dni(df, dni):
-    resultado = df[df['DNI'] == dni]
-    if not resultado.empty:
-        return resultado
-    else:
-        return None
+% Configuración de página
+\geometry{top=3cm, bottom=3cm, left=2.5cm, right=2.5cm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\slshape Informe Técnico}
+\fancyhead[R]{\thepage}
+\fancyfoot[C]{\textbf{Universidad Nacional del Altiplano}}
 
-def busqueda_ternaria(lista, objetivo):
-    izq = 0
-    der = len(lista) - 1
-    saltos = 0
+% Título y autor
+\title{\textbf{Informe Técnico: Desarrollo de un Programa con Interfaz}}
+\author{
+    \textbf{Estudiante:} Chambi Chambi Jhon Kenedy \\ 
+    \textbf{Docente:} Fred Torres Cruz \\
+    Facultad de Ingeniería Estadística e Informática \\
+    Universidad Nacional del Altiplano
+}
+\date{\today}
 
-    while izq <= der:
-        tercio1 = izq + (der - izq) // 3
-        tercio2 = der - (der - izq) // 3
-        saltos += 1
+\begin{document}
 
-        if lista[tercio1] == objetivo:
-            return tercio1, saltos
-        if lista[tercio2] == objetivo:
-            return tercio2, saltos
-        if objetivo < lista[tercio1]:
-            der = tercio1 - 1
-        elif objetivo > lista[tercio2]:
-            izq = tercio2 + 1
-        else:
-            izq = tercio1 + 1
-            der = tercio2 - 1
+% Portada
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    \includegraphics[width=0.3\textwidth]{logo_universidad.png}\\[1cm]
+    {\Huge\bfseries Informe Técnico}\\[0.5cm]
+    \textbf{\LARGE Desarrollo de un Programa con Interfaz}\\[2cm]
+    \textbf{Docente:} Fred Torres Cruz \\[0.5cm]
+    \textbf{Estudiante:} Chambi Chambi Jhon Kenedy \\[0.5cm]
+    Facultad de Ingeniería Estadística e Informática \\[1cm]
+    \textbf{Fecha:} \today \\
+    \vfill
+    \textbf{Universidad Nacional del Altiplano}
+\end{titlepage}
 
-    return -1, saltos
+% Índice
+\tableofcontents
+\newpage
 
-def buscar_por_salto(df, dni):
-    datos = df.sort_values(by="DNI").reset_index(drop=True)
-    n = len(datos)
-    step = int(math.sqrt(n))
-    saltos = 0
+% Introducción
+\chapter{Introducción}
+En este informe técnico se describe el desarrollo de un programa que permite la lectura de archivos TXT mediante una interfaz gráfica. El objetivo principal es facilitar la interacción del usuario y demostrar el uso de algoritmos básicos de procesamiento de texto.
 
-    prev = 0
-    while prev < n and datos.iloc[min(step, n) - 1]["DNI"] < dni:
-        saltos += 1
-        prev = step
-        step += int(math.sqrt(n))
-        if prev >= n:
-            return None, saltos
+% Desarrollo
+\chapter{Desarrollo}
+\section{Herramientas Utilizadas}
+\begin{itemize}
+    \item Lenguaje de programación: C++
+    \item Entorno de desarrollo: Visual Studio Code
+    \item Librerías: Qt para interfaz gráfica, fstream para manejo de archivos
+\end{itemize}
 
-    for i in range(prev, min(step, n)):
-        saltos += 1
-        if datos.iloc[i]["DNI"] == dni:
-            return datos.iloc[[i]], saltos
+\section{Diseño del Programa}
+El programa se compone de dos módulos principales:
+\begin{enumerate}
+    \item \textbf{Interfaz gráfica:} Desarrollada con Qt para facilitar la interacción.
+    \item \textbf{Procesamiento de archivos:} Implementado con funciones en C++ para la lectura y manejo de datos.
+\end{enumerate}
 
-    return None, saltos
+\section{Código Principal}
+\begin{verbatim}
+// Ejemplo de código en C++
+#include <iostream>
+#include <fstream>
+using namespace std;
 
-def crear_hash(df):
-    return {row['DNI']: row.to_dict() for _, row in df.iterrows()}
+int main() {
+    string archivo = "datos.txt";
+    ifstream entrada(archivo);
 
-def buscar_por_dni_hash(hash_table, dni):
-    return hash_table.get(dni, None), 1
+    if (entrada.is_open()) {
+        string linea;
+        while (getline(entrada, linea)) {
+            cout << linea << endl;
+        }
+        entrada.close();
+    } else {
+        cout << "Error al abrir el archivo" << endl;
+    }
+    return 0;
+}
+\end{verbatim}
 
-def busqueda_binaria(lista, objetivo):
-    izq = 0
-    der = len(lista) - 1
-    saltos = 0
+% Resultados
+\chapter{Resultados}
+\section{Prueba del Programa}
+El programa fue capaz de leer un archivo TXT y mostrar su contenido en la interfaz gráfica, como se observa en las Figuras \ref{fig:archivo_a_leer} y \ref{fig:lectura_exitosa}.
 
-    while izq <= der:
-        medio = (izq + der) // 2
-        saltos += 1
-        if lista[medio] == objetivo:
-            return medio, saltos
-        elif lista[medio] < objetivo:
-            izq = medio + 1
-        else:
-            der = medio - 1
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{archivo_a_leer.png}
+    \caption{Archivo a leer}
+    \label{fig:archivo_a_leer}
+\end{figure}
 
-    return -1, saltos
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{lectura_exitosa.png}
+    \caption{Lectura exitosa del archivo}
+    \label{fig:lectura_exitosa}
+\end{figure}
 
-# Función para realizar la búsqueda
-def realizar_busqueda():
-    metodo = combo_metodo.get()
-    dni_input = entrada_dni.get()
+% Conclusiones
+\chapter{Conclusiones}
+Se logró implementar un programa con interfaz gráfica funcional para la lectura de archivos TXT. Este proyecto demuestra la integración de algoritmos de procesamiento de texto y herramientas modernas para interfaces gráficas.
 
-    if not dni_input.isdigit():
-        resultado_texto.insert(END, "Por favor, ingrese un DNI válido (sólo números).\n")
-        return
+% Referencias
+\chapter{Referencias}
+\begin{itemize}
+    \item Qt Documentation: \url{https://doc.qt.io}
+    \item C++ Standard Library Reference: \url{https://en.cppreference.com}
+\end{itemize}
 
-    dni_a_buscar = int(dni_input)
-    inicio = time.perf_counter()
-    resultado = None
-    saltos = 0
+\end{document}
 
-    if metodo == "Búsqueda lineal":
-        resultado = buscar_por_dni(df, dni_a_buscar)
-    elif metodo == "Búsqueda ternaria":
-        indice, saltos = busqueda_ternaria(lista_dnis, dni_a_buscar)
-        if indice != -1:
-            resultado = df.iloc[[indice]]
-    elif metodo == "Búsqueda por salto":
-        resultado, saltos = buscar_por_salto(df, dni_a_buscar)
-    elif metodo == "Búsqueda hash":
-        resultado, saltos = buscar_por_dni_hash(hash_table, dni_a_buscar)
-    elif metodo == "Búsqueda binaria":
-        indice, saltos = busqueda_binaria(lista_dnis, dni_a_buscar)
-        if indice != -1:
-            resultado = df.iloc[[indice]]
-    
-    tiempo = time.perf_counter() - inicio
-
-    if resultado is not None and not isinstance(resultado, dict):
-        resultado_texto.insert(END, f"\nResultado encontrado:\n{resultado.to_string(index=False)}\n")
-    elif isinstance(resultado, dict):
-        resultado_texto.insert(END, f"\nResultado encontrado:\n")
-        for clave, valor in resultado.items():
-            resultado_texto.insert(END, f"{clave}: {valor}\n")
-    else:
-        resultado_texto.insert(END, "\nNo se encontró ningún registro con el DNI ingresado.\n")
-
-    resultado_texto.insert(END, f"Tiempo de búsqueda: {tiempo:.6f} segundos\n")
-    resultado_texto.insert(END, f"Saltos realizados: {saltos if metodo != 'Búsqueda lineal' else 'N/A'}\n")
-    resultado_texto.insert(END, "-" * 50 + "\n")
-
-# Leer el archivo y preparar datos
-df = pd.read_excel('C:\\Users\\ASUS TUF GAMING\\Documents\\TRABAJOS\\VStudioCode\\Venta.xlsx')
-df["DNI"] = pd.to_numeric(df["DNI"], errors="coerce")
-lista_dnis = df['DNI'].sort_values().tolist()
-hash_table = crear_hash(df)
-
-# Crear ventana principal
-ventana = Tk()
-ventana.title("Buscador de DNIs")
-ventana.geometry("700x500")
-
-# Etiquetas y entradas
-Label(ventana, text="Ingrese el DNI a buscar:").pack(pady=5)
-entrada_dni = Entry(ventana)
-entrada_dni.pack(pady=5)
-
-Label(ventana, text="Seleccione el método de búsqueda:").pack(pady=5)
-combo_metodo = ttk.Combobox(ventana, values=["Búsqueda lineal", "Búsqueda ternaria", "Búsqueda por salto", "Búsqueda hash", "Búsqueda binaria"])
-combo_metodo.current(0)
-combo_metodo.pack(pady=5)
-
-Button(ventana, text="Buscar", command=realizar_busqueda).pack(pady=10)
-
-resultado_texto = Text(ventana, height=15, width=80)
-resultado_texto.pack(pady=10)
-
-# Ejecutar ventana
-ventana.mainloop()
