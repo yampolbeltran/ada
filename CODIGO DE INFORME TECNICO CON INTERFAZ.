@@ -1,124 +1,64 @@
-\documentclass[a4paper,12pt]{report}
-\usepackage[utf8]{inputenc}
-\usepackage[spanish]{babel}
-\usepackage{graphicx}
-\usepackage{amsmath}
-\usepackage{geometry}
-\usepackage{hyperref}
-\usepackage{fancyhdr}
+#include <QApplication>
+#include <QWidget>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QFileDialog>
+#include <QFile>
+#include <QTextStream>
+#include <QMessageBox>
 
-% Configuración de página
-\geometry{top=3cm, bottom=3cm, left=2.5cm, right=2.5cm}
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[L]{\slshape Informe Técnico}
-\fancyhead[R]{\thepage}
-\fancyfoot[C]{\textbf{Universidad Nacional del Altiplano}}
+class FileReaderApp : public QWidget {
+    Q_OBJECT
 
-% Título y autor
-\title{\textbf{Informe Técnico: Desarrollo de un Programa con Interfaz}}
-\author{
-    \textbf{Estudiante:} Chambi Chambi Jhon Kenedy \\ 
-    \textbf{Docente:} Fred Torres Cruz \\
-    Facultad de Ingeniería Estadística e Informática \\
-    Universidad Nacional del Altiplano
-}
-\date{\today}
+public:
+    FileReaderApp(QWidget *parent = nullptr) : QWidget(parent) {
+        // Configuración de la ventana principal
+        setWindowTitle("Lector de Archivos TXT");
+        resize(600, 400);
 
-\begin{document}
+        // Layout principal
+        QVBoxLayout *layout = new QVBoxLayout(this);
 
-% Portada
-\begin{titlepage}
-    \centering
-    \vspace*{1cm}
-    \includegraphics[width=0.3\textwidth]{logo_universidad.png}\\[1cm]
-    {\Huge\bfseries Informe Técnico}\\[0.5cm]
-    \textbf{\LARGE Desarrollo de un Programa con Interfaz}\\[2cm]
-    \textbf{Docente:} Fred Torres Cruz \\[0.5cm]
-    \textbf{Estudiante:} Chambi Chambi Jhon Kenedy \\[0.5cm]
-    Facultad de Ingeniería Estadística e Informática \\[1cm]
-    \textbf{Fecha:} \today \\
-    \vfill
-    \textbf{Universidad Nacional del Altiplano}
-\end{titlepage}
+        // Botón para abrir archivo
+        QPushButton *openButton = new QPushButton("Abrir Archivo", this);
+        connect(openButton, &QPushButton::clicked, this, &FileReaderApp::openFile);
 
-% Índice
-\tableofcontents
-\newpage
+        // Área de texto para mostrar contenido del archivo
+        textArea = new QTextEdit(this);
+        textArea->setReadOnly(true);
 
-% Introducción
-\chapter{Introducción}
-En este informe técnico se describe el desarrollo de un programa que permite la lectura de archivos TXT mediante una interfaz gráfica. El objetivo principal es facilitar la interacción del usuario y demostrar el uso de algoritmos básicos de procesamiento de texto.
-
-% Desarrollo
-\chapter{Desarrollo}
-\section{Herramientas Utilizadas}
-\begin{itemize}
-    \item Lenguaje de programación: C++
-    \item Entorno de desarrollo: Visual Studio Code
-    \item Librerías: Qt para interfaz gráfica, fstream para manejo de archivos
-\end{itemize}
-
-\section{Diseño del Programa}
-El programa se compone de dos módulos principales:
-\begin{enumerate}
-    \item \textbf{Interfaz gráfica:} Desarrollada con Qt para facilitar la interacción.
-    \item \textbf{Procesamiento de archivos:} Implementado con funciones en C++ para la lectura y manejo de datos.
-\end{enumerate}
-
-\section{Código Principal}
-\begin{verbatim}
-// Ejemplo de código en C++
-#include <iostream>
-#include <fstream>
-using namespace std;
-
-int main() {
-    string archivo = "datos.txt";
-    ifstream entrada(archivo);
-
-    if (entrada.is_open()) {
-        string linea;
-        while (getline(entrada, linea)) {
-            cout << linea << endl;
-        }
-        entrada.close();
-    } else {
-        cout << "Error al abrir el archivo" << endl;
+        // Agregar widgets al layout
+        layout->addWidget(openButton);
+        layout->addWidget(textArea);
     }
-    return 0;
+
+private slots:
+    void openFile() {
+        // Mostrar un cuadro de diálogo para seleccionar un archivo
+        QString fileName = QFileDialog::getOpenFileName(this, "Seleccionar Archivo", "", "Archivos de texto (*.txt)");
+        if (!fileName.isEmpty()) {
+            QFile file(fileName);
+            if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                QTextStream in(&file);
+                QString content = in.readAll();
+                file.close();
+                textArea->setText(content); // Mostrar contenido en el área de texto
+            } else {
+                QMessageBox::warning(this, "Error", "No se pudo abrir el archivo.");
+            }
+        }
+    }
+
+private:
+    QTextEdit *textArea; // Área de texto para mostrar el contenido del archivo
+};
+
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+    FileReaderApp window;
+    window.show();
+    return app.exec();
 }
-\end{verbatim}
 
-% Resultados
-\chapter{Resultados}
-\section{Prueba del Programa}
-El programa fue capaz de leer un archivo TXT y mostrar su contenido en la interfaz gráfica, como se observa en las Figuras \ref{fig:archivo_a_leer} y \ref{fig:lectura_exitosa}.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=\textwidth]{archivo_a_leer.png}
-    \caption{Archivo a leer}
-    \label{fig:archivo_a_leer}
-\end{figure}
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=\textwidth]{lectura_exitosa.png}
-    \caption{Lectura exitosa del archivo}
-    \label{fig:lectura_exitosa}
-\end{figure}
-
-% Conclusiones
-\chapter{Conclusiones}
-Se logró implementar un programa con interfaz gráfica funcional para la lectura de archivos TXT. Este proyecto demuestra la integración de algoritmos de procesamiento de texto y herramientas modernas para interfaces gráficas.
-
-% Referencias
-\chapter{Referencias}
-\begin{itemize}
-    \item Qt Documentation: \url{https://doc.qt.io}
-    \item C++ Standard Library Reference: \url{https://en.cppreference.com}
-\end{itemize}
-
-\end{document}
 
